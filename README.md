@@ -206,7 +206,7 @@ mysql -u root -p eams_db < sql/seed_data.sql
 ---
 
 ## 👨‍💻 Author
-**Abhinav Jha (mradu)**  
+**Abhinav Jha , Maradul Krishna Bhardwaj and Anurag Upadhyay**  
 Built with Java, MySQL, Maven & JDBC.
 
 ---
