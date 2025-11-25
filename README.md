@@ -1,25 +1,31 @@
 
-# 🚨 **Emergency Alert Management System (EAMS)**
-*A Java + MySQL based emergency alert broadcasting system.*
-
-## 📘 Overview
-The **Emergency Alert Management System (EAMS)** is a Java-based application that allows authorized users to:
-- Create urgent alerts  
-- Broadcast alerts  
-- View pending alerts  
-- Store alerts securely in a MySQL database  
-
-This project demonstrates:
-- ✔ Core Java  
-- ✔ Object-Oriented Programming  
-- ✔ JDBC Connectivity  
-- ✔ DAO Pattern  
-- ✔ MySQL schema design  
-- ✔ Proper project structure (Maven)
+# 🚨 Emergency Alert Management System (EAMS)
+*A Java + MySQL based emergency alert broadcasting system with a full Swing-based GUI.*
 
 ---
 
-## 📂 Project Structure
+# 📘 Overview
+The **Emergency Alert Management System (EAMS)** is a complete Java-based application that enables authorized users to:
+- Create emergency alerts  
+- View pending alerts  
+- Broadcast alerts  
+- Login securely  
+- Interact with a clean **Swing GUI**  
+- Store alerts in a MySQL database  
+
+This project demonstrates:
+- ✔ Core Java  
+- ✔ OOP  
+- ✔ JDBC  
+- ✔ Swing GUI  
+- ✔ DAO Pattern  
+- ✔ MySQL schema  
+- ✔ Maven-based modular structure  
+
+---
+
+# 📂 Updated Project Structure (Including GUI)
+
 ```
 EAMS_project/
 │
@@ -36,13 +42,22 @@ EAMS_project/
     └── main/
         ├── java/
         │   └── com/eams/
-        │       ├── MainApp.java
+        │       ├── MainApp.java              
+        │       │
+        │       ├── gui/                      
+        │       │   ├── LoginWindow.java
+        │       │   ├── Dashboard.java
+        │       │   ├── CreateAlertForm.java
+        │       │   └── PendingAlertsWindow.java
+        │       │
         │       ├── dao/
         │       │   ├── AlertDAO.java
         │       │   └── UserDAO.java
+        │       │
         │       ├── model/
         │       │   ├── Alert.java
         │       │   └── User.java
+        │       │
         │       └── util/
         │           └── DBConnection.java
         │
@@ -52,19 +67,75 @@ EAMS_project/
 
 ---
 
-## 🛠️ Technologies Used
-| Technology | Purpose |
-|-----------|----------|
-| **Java 11+** | Core backend |
-| **MySQL 8+** | Database |
-| **JDBC** | Connectivity |
-| **Maven** | Build & Dependencies |
-| **jBCrypt** | Password hashing |
-| **MySQL Connector/J** | MySQL driver |
+# 🖥️ GUI Features (New Section)
+
+## ✔ 1. Login Window
+Provides secure authentication using BCrypt + UserDAO.
+
+- Username/password input  
+- DAO-based validation  
+- Hash comparison  
+- Loads Dashboard after successful login  
 
 ---
 
-## 🗄️ Database Schema (MySQL)
+## ✔ 2. Dashboard Window
+Central hub for user actions.
+
+Contains buttons:
+- Create Alert  
+- View Pending Alerts  
+- Exit Application  
+
+---
+
+## ✔ 3. Create Alert Form
+Allows users to create new alerts visually.
+
+Fields:
+- Title  
+- Message  
+- Severity (LOW / MEDIUM / HIGH / CRITICAL)
+
+On submission:
+- Uses `AlertDAO.createAlert()`
+- Saves alert to MySQL  
+- Shows success prompt  
+
+---
+
+## ✔ 4. Pending Alerts Window
+Displays all pending alerts in a JTable.
+
+Features:
+- List alerts using `AlertDAO.listPendingAlerts()`  
+- Broadcast selected alert using `AlertDAO.markBroadcasted()`  
+- Auto-refresh after broadcast  
+
+---
+
+# 🧱 Build the Project
+
+```bash
+mvn clean package
+```
+
+---
+
+# ▶️ Run the Application (GUI Mode)
+
+```bash
+java -jar target/eams-1.0-SNAPSHOT-jar-with-dependencies.jar
+```
+
+Or run from an IDE:
+- Open `MainApp.java`
+- Click Run ▶️
+
+---
+
+# 🗄️ Database Schema
+
 ```sql
 CREATE DATABASE IF NOT EXISTS eams_db;
 USE eams_db;
@@ -92,7 +163,8 @@ CREATE TABLE IF NOT EXISTS alerts(
 
 ---
 
-## 🔌 JDBC Configuration
+# 🔌 JDBC Configuration
+
 ```properties
 jdbc.url=jdbc:mysql://localhost:3306/eams_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
 jdbc.username=root
@@ -102,81 +174,27 @@ jdbc.driver=com.mysql.cj.jdbc.Driver
 
 ---
 
-## 🧱 Build the Project
-```bash
-mvn clean package
-```
+# 💻 MainApp (GUI Version)
 
----
-
-## ▶️ Run the Application
-```bash
-java -jar target/eams-1.0-SNAPSHOT-jar-with-dependencies.jar
-```
-
----
-
-## 💻 Core Java Snippets
-
-### Alert Model
 ```java
-public class Alert {
-    private int id;
-    private String title;
-    private String message;
-    private String severity;
-    private int createdBy;
-    private Local.time.LocalDateTime createdAt;
-    private boolean isBroadcasted;
-    private Local.time.LocalDateTime broadcastedAt;
-}
-```
+package com.eams;
 
-### AlertDAO Example
-```java
-public int createAlert(Alert alert) throws SQLException {
-    String sql = "INSERT INTO alerts (title, message, severity, created_by) VALUES (?, ?, ?, ?)";
-    try (Connection conn = DBConnection.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-        ps.setString(1, alert.getTitle());
-        ps.setString(2, alert.getMessage());
-        ps.setString(3, alert.getSeverity());
-        ps.setInt(4, alert.getCreatedBy());
-        ps.executeUpdate();
-        ResultSet rs = ps.getGeneratedKeys();
-        if (rs.next()) return rs.getInt(1);
-    }
-    return -1;
-}
-```
+import com.eams.gui.LoginWindow;
 
-### Main Application
-```java
 public class MainApp {
     public static void main(String[] args) {
-        System.out.println("EAMS - Demo Start");
-        try {
-            UserDAO userDAO = new UserDAO();
-            User admin = userDAO.findByUsername("admin");
 
-            AlertDAO alertDAO = new AlertDAO();
-            Alert alert = new Alert("Roadblock", "Major accident on Highway 7.", "HIGH", admin.getId());
-            int id = alertDAO.createAlert(alert);
-
-            alertDAO.listPendingAlerts().forEach(System.out::println);
-
-            alertDAO.markBroadcasted(id);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            LoginWindow loginWindow = new LoginWindow();
+            loginWindow.setVisible(true);
+        });
     }
 }
 ```
 
 ---
 
-## 📤 Importing Database
+# 📤 Importing Database
 
 CMD method:
 ```bash
@@ -186,30 +204,50 @@ mysql -u root -p eams_db < sql/seed_data.sql
 
 ---
 
-## 🚀 Features Implemented
-- ✔ Create alerts  
-- ✔ List pending alerts  
-- ✔ Broadcast alerts  
-- ✔ DAO + JDBC design  
-- ✔ MySQL integration  
-- ✔ BCrypt hashing support  
+# 🚀 Features Implemented
+
+- ✔ Console backend + GUI  
+- ✔ Login system  
+- ✔ Alert creation  
+- ✔ Pending alert table  
+- ✔ Broadcasting system  
+- ✔ Secure database integration  
+- ✔ DAO abstraction  
+- ✔ BCrypt password hashing  
 
 ---
 
-## 📌 Future Enhancements
-- 🔐 Login system  
-- 🖥 GUI (Swing / JavaFX)  
+# 📌 Future Enhancements
+
+- 🔐 Admin/operator roles in GUI  
+- 🌐 Web dashboard using Spring Boot  
 - 📡 Real-time notifications  
-- 📱 SMS/Email gateway  
+- 📱 Email/SMS broadcasting  
 - 📊 Analytics dashboard  
+- 🗂 Logging & audit system  
 
 ---
 
-## 👨‍💻 Author
-**Abhinav Jha , Maradul Krishna Bhardwaj and Anurag Upadhyay**  
-Built with Java, MySQL, Maven & JDBC.
+# 👨‍💻 Authors
+
+**Team Leader & System Architect:**  
+**Abhinav Jha (Scranoid)**  
+Adm No: 24scse1010454  
+GitHub: https://github.com/Scranoid  
+
+**Lead Designer:**  
+**Mradul Krishna Bhardwaj**  
+Adm No: 24scse1010433  
+GitHub: https://github.com/chhayabhardwaj111-create  
+
+**System Admin & Maintainer:**  
+**Anurag Upadhyay**  
+Adm No: 24scse1011310  
+GitHub: https://github.com/anurag282024  
 
 ---
 
-## 🏁 Conclusion
-A complete backend system for managing and broadcasting emergency alerts with clean project structure and extensible design.
+# 🏁 Conclusion
+
+The EAMS includes a **fully functional Swing GUI** built on top of a solid Java backend.  
+It is clean, modular, extendable, and perfect for academic submission or real-world scaling.
