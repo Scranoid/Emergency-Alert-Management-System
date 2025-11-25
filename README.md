@@ -174,7 +174,7 @@ jdbc.driver=com.mysql.cj.jdbc.Driver
 
 ---
 
-# 💻 MainApp (GUI Version)
+# 💻 MainApp 
 
 ```java
 package com.eams;
